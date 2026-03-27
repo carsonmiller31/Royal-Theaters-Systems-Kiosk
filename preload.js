@@ -1,9 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 const ADMIN_SWIPE = {
-  edgeThresholdPx: 80,
-  minHorizontalDistancePx: 140,
-  maxVerticalDriftPx: 80,
+  rightEdgeThresholdPx: 80,
+  topEdgeThresholdPx: 70,
+  minVerticalDistancePx: 140,
+  maxHorizontalDriftPx: 80,
   cooldownMs: 1200
 };
 
@@ -27,16 +28,20 @@ function setupAdminSwipeGesture() {
 
     const touch = event.touches[0];
     const startX = touch.clientX;
+    const startY = touch.clientY;
     const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
 
-    if (viewportWidth - startX > ADMIN_SWIPE.edgeThresholdPx) {
+    if (
+      viewportWidth - startX > ADMIN_SWIPE.rightEdgeThresholdPx ||
+      startY > ADMIN_SWIPE.topEdgeThresholdPx
+    ) {
       resetSwipeState();
       return;
     }
 
     swipeState = {
       startX,
-      startY: touch.clientY,
+      startY,
       triggered: false
     };
   }, { passive: true, capture: true });
@@ -47,15 +52,15 @@ function setupAdminSwipeGesture() {
     }
 
     const touch = event.touches[0];
-    const deltaX = swipeState.startX - touch.clientX;
-    const deltaY = Math.abs(touch.clientY - swipeState.startY);
+    const deltaX = Math.abs(touch.clientX - swipeState.startX);
+    const deltaY = touch.clientY - swipeState.startY;
 
-    if (touch.clientX > swipeState.startX || deltaY > ADMIN_SWIPE.maxVerticalDriftPx) {
+    if (touch.clientY < swipeState.startY || deltaX > ADMIN_SWIPE.maxHorizontalDriftPx) {
       resetSwipeState();
       return;
     }
 
-    if (deltaX >= ADMIN_SWIPE.minHorizontalDistancePx) {
+    if (deltaY >= ADMIN_SWIPE.minVerticalDistancePx) {
       swipeState.triggered = true;
       lastAdminSwipeAt = Date.now();
       ipcRenderer.invoke('open-admin-panel').catch((error) => {
