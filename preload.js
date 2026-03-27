@@ -1,5 +1,73 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+const ADMIN_SWIPE = {
+  edgeThresholdPx: 80,
+  minHorizontalDistancePx: 140,
+  maxVerticalDriftPx: 80,
+  cooldownMs: 1200
+};
+
+let swipeState = null;
+let lastAdminSwipeAt = 0;
+
+function resetSwipeState() {
+  swipeState = null;
+}
+
+function canTriggerAdminSwipe() {
+  return Date.now() - lastAdminSwipeAt >= ADMIN_SWIPE.cooldownMs;
+}
+
+function setupAdminSwipeGesture() {
+  window.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1 || !canTriggerAdminSwipe()) {
+      resetSwipeState();
+      return;
+    }
+
+    const touch = event.touches[0];
+    const startX = touch.clientX;
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+
+    if (viewportWidth - startX > ADMIN_SWIPE.edgeThresholdPx) {
+      resetSwipeState();
+      return;
+    }
+
+    swipeState = {
+      startX,
+      startY: touch.clientY,
+      triggered: false
+    };
+  }, { passive: true, capture: true });
+
+  window.addEventListener('touchmove', (event) => {
+    if (!swipeState || swipeState.triggered || event.touches.length !== 1) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    const deltaX = swipeState.startX - touch.clientX;
+    const deltaY = Math.abs(touch.clientY - swipeState.startY);
+
+    if (touch.clientX > swipeState.startX || deltaY > ADMIN_SWIPE.maxVerticalDriftPx) {
+      resetSwipeState();
+      return;
+    }
+
+    if (deltaX >= ADMIN_SWIPE.minHorizontalDistancePx) {
+      swipeState.triggered = true;
+      lastAdminSwipeAt = Date.now();
+      ipcRenderer.invoke('open-admin-panel').catch((error) => {
+        console.log('Admin swipe gesture failed:', error);
+      });
+    }
+  }, { passive: true, capture: true });
+
+  window.addEventListener('touchend', resetSwipeState, { passive: true, capture: true });
+  window.addEventListener('touchcancel', resetSwipeState, { passive: true, capture: true });
+}
+
 // Simple API for printing and admin functions
 contextBridge.exposeInMainWorld('electronAPI', {
   print: (text) => ipcRenderer.invoke('print', text),
@@ -33,5 +101,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Admin update status messages
   onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_, payload) => callback(payload))
 });
+
+setupAdminSwipeGesture();
 
 console.log('✅ Simple Electron API ready');
