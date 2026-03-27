@@ -10,7 +10,7 @@ class SettingsManager {
     this.legacyConfigPath = path.join(__dirname, 'config.json');
 
     this.defaults = {
-      appUrl: 'https://food-pos.royaltheaters-systems.com',
+      appUrl: 'https://systems.royaltheaters.com',
       adminPassword: '1016',
       hasSeenDriverPrompt: false,
       driverInstalled: false

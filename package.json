@@ -1,9 +1,9 @@
 {
-  "name": "pos-kiosk",
-  "version": "1.0.13",
-  "description": "POS Kiosk Electron wrapper for Royal Theater",
+  "name": "royal-theaters-systems-kiosk",
+  "version": "1.0.14",
+  "description": "Royal Theaters Systems Electron wrapper",
   "main": "main.js",
-  "homepage": "https://github.com/moviemill/pos-kiosk",
+  "homepage": "https://github.com/carsonmiller31/Royal-Theaters-Systems-Kiosk",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
@@ -24,10 +24,10 @@
     "release": "npm run release:win"
   },
   "build": {
-    "appId": "com.royaltheater.poskiosk",
-    "productName": "Royal Theater POS Kiosk",
-    "copyright": "Copyright © 2024 Royal Theater",
-    "icon": "kitchen-pos-logo Background Removed.png",
+    "appId": "com.royaltheaters.systems",
+    "productName": "Royal Theaters Systems",
+    "copyright": "Copyright © 2024 Royal Theaters",
+    "icon": "assets/icon.png",
     "directories": {
       "output": "dist"
     },
@@ -42,17 +42,17 @@
       "admin-panel.html",
       "driver-setup.html",
       "update-notification.html",
-      "package.json",
-      "kitchen-pos-logo Background Removed.png"
+      "package.json"
     ],
     "win": {
+      "icon": "assets/icon.ico",
       "target": {
         "target": "nsis",
         "arch": [
           "x64"
         ]
       },
-      "artifactName": "RoyalTheater-POS-Kiosk-Setup-${version}.${ext}",
+      "artifactName": "RoyalTheaters-Systems-Setup-${version}.${ext}",
       "extraResources": [
         {
           "from": "AURES Elite Printer Driver 4.64.exe",
@@ -61,6 +61,7 @@
       ]
     },
     "mac": {
+      "icon": "assets/icon.icns",
       "target": [
         {
           "target": "dmg",
@@ -82,6 +83,7 @@
       "gatekeeperAssess": false
     },
     "linux": {
+      "icon": "assets/icon.png",
       "target": [
         {
           "target": "AppImage",
@@ -99,9 +101,9 @@
       "category": "Office"
     },
     "appx": {
-      "displayName": "Royal Theater POS Kiosk",
-      "identityName": "com.royaltheater.poskiosk",
-      "publisherDisplayName": "Royal Theater",
+      "displayName": "Royal Theaters Systems",
+      "identityName": "com.royaltheaters.systems",
+      "publisherDisplayName": "Royal Theaters",
       "backgroundColor": "#000000"
     },
     "nsis": {
@@ -110,10 +112,10 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Royal Theater POS Kiosk"
+      "shortcutName": "Royal Theaters Systems"
     },
     "dmg": {
-      "title": "Royal Theater POS Kiosk ${version}",
+      "title": "Royal Theaters Systems ${version}",
       "iconSize": 100,
       "window": {
         "width": 600,
@@ -136,13 +138,13 @@
     "publish": {
       "provider": "github",
       "owner": "carsonmiller31",
-      "repo": "Food-POS-Electron-Wrapper",
+      "repo": "Royal-Theaters-Systems-Kiosk",
       "private": false,
       "releaseType": "release"
     }
   },
   "keywords": [],
-  "author": "Royal Theater",
+  "author": "Royal Theaters",
   "type": "commonjs",
   "dependencies": {
     "electron-updater": "^6.6.2"

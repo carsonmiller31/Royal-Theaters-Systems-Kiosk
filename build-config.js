@@ -27,7 +27,7 @@ const config = {
   
   mac: {
     // macOS code signing
-    identity: process.env.MAC_CERT_NAME || 'Developer ID Application: Royal Theater',
+    identity: process.env.MAC_CERT_NAME || 'Developer ID Application: Royal Theaters',
     
     // App Store Connect API (for notarization)
     appleId: process.env.APPLE_ID,
@@ -57,8 +57,8 @@ const config = {
   // Publish configuration
   publish: {
     provider: 'github',
-    owner: process.env.GITHUB_OWNER || 'royaltheater',
-    repo: process.env.GITHUB_REPO || 'pos-kiosk',
+    owner: process.env.GITHUB_OWNER || 'carsonmiller31',
+    repo: process.env.GITHUB_REPO || 'Royal-Theaters-Systems-Kiosk',
     // No token used; publishing handled via GitHub CLI in scripts
     private: false,
     releaseType: 'release' // 'draft', 'prerelease', 'release'

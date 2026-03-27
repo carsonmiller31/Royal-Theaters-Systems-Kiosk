@@ -19,7 +19,7 @@ function createWindow() {
   settings = new SettingsManager();
   
   // Version info for testing
-  console.log('🚀 Royal Theater POS Kiosk v' + app.getVersion() + ' - Auto-update test version!');
+  console.log('🚀 Royal Theaters Systems v' + app.getVersion() + ' - Auto-update test version!');
   
   // Set app to launch at startup
   app.setLoginItemSettings({
@@ -147,11 +147,11 @@ function setupAutoUpdater() {
     console.log('🔗 Using GENERIC update provider:', UPDATE_URL);
     autoUpdater.setFeedURL({ provider: 'generic', url: UPDATE_URL });
   } else {
-    console.log('🔗 Using GITHUB update provider (public): carsonmiller31/Food-POS-Electron-Wrapper');
+    console.log('🔗 Using GITHUB update provider (public): carsonmiller31/Royal-Theaters-Systems-Kiosk');
     autoUpdater.setFeedURL({
       provider: 'github',
       owner: 'carsonmiller31',
-      repo: 'Food-POS-Electron-Wrapper'
+      repo: 'Royal-Theaters-Systems-Kiosk'
     });
   }
   
@@ -166,7 +166,7 @@ function setupAutoUpdater() {
   // Auto-updater events
   autoUpdater.on('checking-for-update', () => {
     console.log('🔍 Checking for update...');
-    console.log('Repository: carsonmiller31/Food-POS-Electron-Wrapper');
+    console.log('Repository: carsonmiller31/Royal-Theaters-Systems-Kiosk');
     console.log('Current version:', app.getVersion());
     if (adminWindow) {
       adminWindow.webContents.send('update-status', { type: 'checking' });
@@ -264,7 +264,7 @@ function gracefulShutdown() {
 function forceKillProcess() {
   console.log('Force killing any remaining application processes...');
   const { exec } = require('child_process');
-  const appName = 'Royal Theater POS Kiosk';
+  const appName = 'Royal Theaters Systems';
   
   // Windows
   if (process.platform === 'win32') {
@@ -504,7 +504,7 @@ ipcMain.handle('check-for-updates', async () => {
   try {
     console.log('🔍 Manual update check requested...');
     console.log('Current app version:', app.getVersion());
-    console.log('Repository: carsonmiller31/Food-POS-Electron-Wrapper');
+    console.log('Repository: carsonmiller31/Royal-Theaters-Systems-Kiosk');
     if (adminWindow) {
       adminWindow.webContents.send('update-status', { type: 'checking' });
     }

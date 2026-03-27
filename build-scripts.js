@@ -87,7 +87,7 @@ function main() {
   const args = process.argv.slice(2);
   const platform = args[0];
 
-  log('Royal Theater POS Kiosk Builder');
+  log('Royal Theaters Systems Builder');
   log('============================');
 
   if (!checkPrerequisites()) {

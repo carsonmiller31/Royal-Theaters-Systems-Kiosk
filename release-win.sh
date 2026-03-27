@@ -12,7 +12,7 @@ set -euo pipefail
 # - On macOS/Linux, building Windows may require wine/mono; if not available, skip build and just upload existing dist assets
 
 REPO_OWNER="carsonmiller31"
-REPO_NAME="Food-POS-Electron-Wrapper"
+REPO_NAME="Royal-Theaters-Systems-Kiosk"
 REPO_SLUG="$REPO_OWNER/$REPO_NAME"
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
@@ -49,7 +49,7 @@ else
 fi
 
 # Determine artifact names/paths
-EXE_PATH="dist/RoyalTheater-POS-Kiosk-Setup-${VERSION}.exe"
+EXE_PATH="dist/RoyalTheaters-Systems-Setup-${VERSION}.exe"
 BLOCKMAP_PATH="${EXE_PATH}.blockmap"
 
 # If expected naming not found, fallback to glob of Setup-${VERSION}.exe

@@ -1,6 +1,6 @@
-# Royal Theater POS Kiosk
+# Royal Theaters Systems
 
-Electron wrapper for Royal Theater POS system that provides silent printing capabilities for kitchen operations.
+Electron wrapper for Royal Theaters Systems that provides kiosk-mode access, silent printing, and desktop integration for internal operations.
 
 ## Features
 
