@@ -294,12 +294,14 @@ function registerAdminShortcut() {
     }
     
     adminWindow = new BrowserWindow({
-      width: 600,
-      height: 500,
+      width: 780,
+      height: 700,
+      minWidth: 680,
+      minHeight: 620,
       modal: true,
       parent: mainWindow,
       autoHideMenuBar: true,
-      resizable: false,
+      resizable: true,
       alwaysOnTop: true,
       webPreferences: {
         nodeIntegration: false,
@@ -621,6 +623,14 @@ ipcMain.handle('app-exit', async () => {
   }
 });
 
+ipcMain.handle('app-restart', async () => {
+  console.log('App restart requested via IPC');
+  isQuitting = true;
+  app.relaunch();
+  app.exit(0);
+  return true;
+});
+
 ipcMain.handle('hard-refresh', async () => {
   console.log('Hard refresh requested via IPC');
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -682,12 +692,14 @@ ipcMain.handle('open-admin-panel', async () => {
   }
   
   adminWindow = new BrowserWindow({
-    width: 600,
-    height: 500,
+    width: 780,
+    height: 700,
+    minWidth: 680,
+    minHeight: 620,
     modal: true,
     parent: mainWindow,
     autoHideMenuBar: true,
-    resizable: false,
+    resizable: true,
     alwaysOnTop: true,
     webPreferences: {
       nodeIntegration: false,

@@ -88,6 +88,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeUpdate: () => ipcRenderer.invoke('close-update'),
   // App controls
   exitApp: () => ipcRenderer.invoke('app-exit'),
+  restartApp: () => ipcRenderer.invoke('app-restart'),
   hardRefresh: () => ipcRenderer.invoke('hard-refresh'),
   deepRefresh: () => ipcRenderer.invoke('deep-refresh'),
   // Timeclock popup

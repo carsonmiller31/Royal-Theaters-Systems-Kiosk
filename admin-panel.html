@@ -4,217 +4,518 @@
     <meta charset="UTF-8">
     <title>Admin Settings</title>
     <style>
+        :root {
+            --bg: #081018;
+            --panel: rgba(17, 23, 31, 0.96);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --surface: #121a24;
+            --surface-2: #182330;
+            --text: #f4f7fb;
+            --muted: #92a1b2;
+            --accent: #2a9dff;
+            --accent-strong: #1579cd;
+            --success: #55d38f;
+            --error: #ff7a7a;
+            --shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            height: 100vh;
+            font-family: "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(42, 157, 255, 0.16), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(85, 211, 143, 0.09), transparent 28%),
+                rgba(5, 10, 16, 0.96);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 18px;
         }
-        
+
         .admin-container {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 8px;
+            width: min(720px, 100%);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.012));
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-shell {
             padding: 30px;
-            width: 500px;
-            max-width: 90vw;
+            background: var(--panel);
         }
-        
+
+        .auth-form {
+            display: block;
+        }
+
+        .home-form {
+            display: block;
+        }
+
+        .settings-form {
+            display: none;
+        }
+
         .admin-header {
-            text-align: center;
-            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
         }
-        
+
         .admin-header h1 {
-            color: #f0f0f0;
-            font-size: 24px;
+            font-size: 28px;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
             margin-bottom: 8px;
         }
-        
+
         .admin-header p {
-            color: #888;
+            color: var(--muted);
             font-size: 14px;
+            line-height: 1.45;
+            max-width: 440px;
         }
-        
+
+        .admin-badge {
+            flex: 0 0 auto;
+            padding: 10px 12px;
+            border: 1px solid rgba(42, 157, 255, 0.18);
+            border-radius: 14px;
+            background: rgba(42, 157, 255, 0.08);
+            color: #cfe8ff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .action-card {
+            min-height: 140px;
+            padding: 18px;
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.18s ease, background-color 0.18s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(42, 157, 255, 0.25);
+            background: linear-gradient(180deg, rgba(42, 157, 255, 0.09), rgba(255, 255, 255, 0.02));
+        }
+
+        .action-card:active {
+            transform: translateY(1px);
+        }
+
+        .action-card .icon {
+            font-size: 26px;
+            line-height: 1;
+            margin-bottom: 14px;
+        }
+
+        .action-card .title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .action-card .desc {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .action-card.sign-in {
+            border-color: rgba(85, 211, 143, 0.24);
+            background: linear-gradient(180deg, rgba(85, 211, 143, 0.1), rgba(255, 255, 255, 0.015));
+        }
+
+        .form-card {
+            padding: 18px;
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.01));
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #cdd9e5;
+            margin-bottom: 16px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
-        
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: #ccc;
+            font-size: 13px;
+            font-weight: 600;
+            color: #d6dee8;
         }
-        
+
         .form-group input {
             width: 100%;
-            padding: 12px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 14px;
+            min-height: 52px;
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1px solid #2a3644;
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 15px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
-        
+
+        .form-group input::placeholder {
+            color: #708398;
+        }
+
         .form-group input:focus {
             outline: none;
-            border-color: #007acc;
-            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+            border-color: var(--accent);
+            background: var(--surface-2);
+            box-shadow: 0 0 0 3px rgba(42, 157, 255, 0.16);
         }
-        
-        .button-group {
+
+        .form-group input:disabled {
+            background: #0f151d;
+            color: #92a1b2;
+            border-color: #222c38;
+            box-shadow: none;
+        }
+
+        .env-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .env-option {
             display: flex;
-            gap: 12px;
-            margin-top: 25px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 12px 14px;
+            border: 1px solid #2a3644;
+            border-radius: 14px;
+            background: var(--surface);
+            color: #d9e2ec;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
         }
-        
+
+        .env-option input {
+            accent-color: var(--accent);
+        }
+
+        .env-option:has(input:checked) {
+            border-color: rgba(42, 157, 255, 0.52);
+            background: rgba(42, 157, 255, 0.12);
+        }
+
+        .helper-text {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .status-row {
+            min-height: 18px;
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .section-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 22px;
+        }
+
         .btn {
-            flex: 1;
-            padding: 12px 20px;
+            min-height: 52px;
+            padding: 12px 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 14px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            transition: background-color 0.18s ease, transform 0.12s ease, opacity 0.18s ease;
         }
-        
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
         .btn-save {
-            background: #007acc;
+            background: var(--accent);
             color: white;
         }
-        
+
         .btn-save:hover {
-            background: #005a99;
+            background: var(--accent-strong);
         }
-        
+
         .btn-cancel {
-            background: #444;
-            color: #ccc;
+            background: #344252;
+            color: #dbe4ed;
         }
-        
+
         .btn-cancel:hover {
-            background: #555;
+            background: #435366;
         }
 
         .btn-update {
-            background: #28a745;
+            background: #2c9253;
             color: white;
         }
 
         .btn-update:hover {
-            background: #218838;
+            background: #257a46;
         }
 
         .btn-driver {
-            background: #8b5cf6;
+            background: #6d55dc;
             color: white;
         }
 
         .btn-driver:hover {
-            background: #7c3aed;
+            background: #5c47c0;
         }
 
-        
-        
-        .auth-form {
-            display: block;
-        }
-        
-        .settings-form {
-            display: none;
-        }
-        
         .error {
-            color: #ff6b6b;
-            font-size: 12px;
-            margin-top: 5px;
+            color: var(--error);
         }
-        
+
         .success {
-            color: #51cf66;
-            font-size: 12px;
-            margin-top: 5px;
+            color: var(--success);
+        }
+
+        @media (max-width: 720px) {
+            .panel-shell {
+                padding: 22px;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-header h1 {
+                font-size: 24px;
+            }
+
+            .env-options,
+            .action-grid,
+            .button-group {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-container">
-        <div class="auth-form" id="authForm">
+        <div class="panel-shell">
+        <div class="home-form" id="homeForm">
             <div class="admin-header">
-                <h1>🔐 Admin Access</h1>
-                <p>Enter password to access settings</p>
+                <div>
+                    <h1>Kiosk Controls</h1>
+                    <p>Quick actions for this terminal. Use these for restart, shutdown, and refresh. Sign in only when you need settings access.</p>
+                </div>
+                <div class="admin-badge">Control Hub</div>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" placeholder="Enter admin password">
-                <div id="authError" class="error"></div>
+            <div class="panel-grid">
+                <div class="form-card">
+                    <div class="card-title">Quick Actions</div>
+                    <div class="action-grid">
+                        <button class="action-card" type="button" onclick="restartApp()">
+                            <div class="icon">↻</div>
+                            <div class="title">Restart App</div>
+                            <div class="desc">Close and relaunch the kiosk wrapper immediately.</div>
+                        </button>
+                        <button class="action-card" type="button" onclick="hardRefresh()">
+                            <div class="icon">⟳</div>
+                            <div class="title">Refresh Display</div>
+                            <div class="desc">Reload the current page and clear the regular HTTP cache.</div>
+                        </button>
+                        <button class="action-card" type="button" onclick="deepRefresh()">
+                            <div class="icon">⌁</div>
+                            <div class="title">Deep Refresh</div>
+                            <div class="desc">Clear storage, cookies, service workers, and then reload.</div>
+                        </button>
+                        <button class="action-card" type="button" onclick="shutdownApp()">
+                            <div class="icon">⏻</div>
+                            <div class="title">Shutdown App</div>
+                            <div class="desc">Exit the kiosk application on this terminal.</div>
+                        </button>
+                    </div>
+                    <div id="homeMessage" class="status-row success"></div>
+                </div>
+
+                <div class="form-card">
+                    <div class="card-title">Protected Settings</div>
+                    <div class="action-grid" style="grid-template-columns: 1fr;">
+                        <button class="action-card sign-in" type="button" onclick="showAuthForm()">
+                            <div class="icon">🔐</div>
+                            <div class="title">Sign In With Admin</div>
+                            <div class="desc">Open environment, URL, password, updates, and printer setup settings.</div>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="button-group">
-                <button class="btn btn-cancel" onclick="closeAdmin()">Cancel</button>
+                <button class="btn btn-cancel" onclick="closeAdmin()">Close</button>
+            </div>
+        </div>
+
+        <div class="auth-form" id="authForm" style="display:none;">
+            <div class="admin-header">
+                <div>
+                    <h1>Admin Sign-In</h1>
+                    <p>Enter the kiosk admin password to unlock protected settings for this terminal.</p>
+                </div>
+                <div class="admin-badge">Secure</div>
+            </div>
+            <div class="panel-grid">
+                <div class="form-card">
+                    <div class="card-title">Authentication</div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter admin password">
+                        <div id="authError" class="status-row error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-cancel" onclick="showHomeForm()">Back</button>
                 <button class="btn btn-save" onclick="authenticate()">Login</button>
             </div>
         </div>
 
         <div class="settings-form" id="settingsForm">
             <div class="admin-header">
-                <h1>⚙️ Admin Settings</h1>
-                <p>Configure application settings</p>
-            </div>
-            <div class="form-group">
-                <label>Environment:</label>
-                <div class="env-options" style="display:flex; gap:16px; color:#ccc;">
-                    <label><input type="radio" name="envOption" id="envProd" value="prod"> Production</label>
-                    <label><input type="radio" name="envOption" id="envDev" value="dev"> Local Dev</label>
-                    <label><input type="radio" name="envOption" id="envCustom" value="custom"> Custom</label>
+                <div>
+                    <h1>Admin Settings</h1>
+                    <p>Everything important in one place: target environment, URL override, password rotation, updates, and printer setup.</p>
                 </div>
-                <div style="margin-top:6px; color:#888; font-size:12px;">Choose a preset or select Custom to enter your own URL.</div>
+                <div class="admin-badge">Systems</div>
             </div>
-            <div class="form-group">
-                <label for="appUrl">Application URL:</label>
-                <input type="text" id="appUrl" placeholder="http://192.168.1.186:3000">
+            <div class="panel-grid">
+                <div class="form-card">
+                    <div class="card-title">Environment</div>
+                    <div class="form-group">
+                        <label>Choose Target</label>
+                        <div class="env-options">
+                            <label class="env-option"><input type="radio" name="envOption" id="envProd" value="prod"> Production</label>
+                            <label class="env-option"><input type="radio" name="envOption" id="envDev" value="dev"> Local Dev</label>
+                            <label class="env-option"><input type="radio" name="envOption" id="envCustom" value="custom"> Custom</label>
+                        </div>
+                        <div class="helper-text">Production and Local Dev lock the URL field to a preset. Choose Custom to type your own target.</div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="card-title">Configuration</div>
+                    <div class="form-group">
+                        <label for="appUrl">Application URL</label>
+                        <input type="text" id="appUrl" placeholder="http://192.168.1.186:3000">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Admin Password</label>
+                        <input type="password" id="newPassword" placeholder="Leave blank to keep current">
+                    </div>
+                    <div id="settingsMessage" class="status-row success"></div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="newPassword">New Admin Password:</label>
-                <input type="password" id="newPassword" placeholder="Leave blank to keep current">
-            </div>
-            <div id="settingsMessage" class="success"></div>
             <div class="button-group">
-                <button class="btn btn-cancel" onclick="closeAdmin()">Close</button>
+                <button class="btn btn-cancel" onclick="showHomeForm()">Back</button>
                 <button class="btn btn-driver" onclick="openDriverSetup()">🖨️ Printer Driver</button>
                 <button class="btn btn-update" onclick="checkForUpdates()">🔄 Check Updates</button>
                 <button class="btn btn-save" onclick="saveSettings()">Save Settings</button>
             </div>
         </div>
+        </div>
     </div>
 
     <script>
         let currentSettings = {};
-        const PROD_URL = 'https://systems.royaltheaters.com';
+        let envListenersBound = false;
+        const PROD_URL = 'https://systems.royaltheaters.com/showtimes/display';
         const DEV_URL = 'http://192.168.1.186:3000';
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('password').focus();
-            
             document.getElementById('password').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') authenticate();
             });
         });
 
+        function showHomeForm() {
+            document.getElementById('homeForm').style.display = 'block';
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('settingsForm').style.display = 'none';
+            document.getElementById('authError').textContent = '';
+            document.getElementById('homeMessage').textContent = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showAuthForm() {
+            document.getElementById('homeForm').style.display = 'none';
+            document.getElementById('authForm').style.display = 'block';
+            document.getElementById('settingsForm').style.display = 'none';
+            document.getElementById('password').focus();
+        }
+
         async function authenticate() {
             const password = document.getElementById('password').value;
             const errorEl = document.getElementById('authError');
-            
+
             if (!password) {
                 errorEl.textContent = 'Please enter a password';
                 return;
@@ -223,6 +524,7 @@
             try {
                 const result = await window.electronAPI.validatePassword(password);
                 if (result.valid) {
+                    errorEl.textContent = '';
                     currentSettings = result.settings;
                     showSettingsForm();
                 } else {
@@ -236,14 +538,14 @@
         }
 
         function showSettingsForm() {
+            document.getElementById('homeForm').style.display = 'none';
             document.getElementById('authForm').style.display = 'none';
             document.getElementById('settingsForm').style.display = 'block';
-            
+
             const appUrlInput = document.getElementById('appUrl');
             const currentUrl = currentSettings.appUrl || '';
             appUrlInput.value = currentUrl;
 
-            // Determine initial environment selection
             if (currentUrl === PROD_URL) {
                 document.getElementById('envProd').checked = true;
                 applyEnvSelection('prod', true);
@@ -254,12 +556,15 @@
                 document.getElementById('envCustom').checked = true;
                 applyEnvSelection('custom', true);
             }
-            appUrlInput.focus();
 
-            // Wire environment radio changes
-            document.getElementById('envProd').addEventListener('change', () => applyEnvSelection('prod'));
-            document.getElementById('envDev').addEventListener('change', () => applyEnvSelection('dev'));
-            document.getElementById('envCustom').addEventListener('change', () => applyEnvSelection('custom'));
+            if (!envListenersBound) {
+                document.getElementById('envProd').addEventListener('change', () => applyEnvSelection('prod'));
+                document.getElementById('envDev').addEventListener('change', () => applyEnvSelection('dev'));
+                document.getElementById('envCustom').addEventListener('change', () => applyEnvSelection('custom'));
+                envListenersBound = true;
+            }
+
+            appUrlInput.focus();
         }
 
         async function saveSettings() {
@@ -308,7 +613,6 @@
                 input.value = DEV_URL;
                 input.disabled = true;
             } else {
-                // custom
                 input.disabled = false;
                 if (initial && !input.value) {
                     input.value = '';
@@ -320,7 +624,7 @@
             const messageEl = document.getElementById('settingsMessage');
             messageEl.textContent = 'Checking for updates...';
             messageEl.className = 'success';
-            
+
             try {
                 const result = await window.electronAPI.checkForUpdates();
                 if (result && result.ok) {
@@ -338,7 +642,41 @@
             }
         }
 
-        
+        async function restartApp() {
+            const messageEl = document.getElementById('homeMessage');
+            messageEl.textContent = 'Restarting app...';
+            messageEl.className = 'status-row success';
+            await window.electronAPI.restartApp();
+        }
+
+        async function shutdownApp() {
+            const messageEl = document.getElementById('homeMessage');
+            messageEl.textContent = 'Shutting down app...';
+            messageEl.className = 'status-row success';
+            await window.electronAPI.exitApp();
+        }
+
+        async function hardRefresh() {
+            const messageEl = document.getElementById('homeMessage');
+            messageEl.textContent = 'Refreshing display...';
+            messageEl.className = 'status-row success';
+            const ok = await window.electronAPI.hardRefresh();
+            if (!ok) {
+                messageEl.textContent = 'Refresh did not complete.';
+                messageEl.className = 'status-row error';
+            }
+        }
+
+        async function deepRefresh() {
+            const messageEl = document.getElementById('homeMessage');
+            messageEl.textContent = 'Performing deep refresh...';
+            messageEl.className = 'status-row success';
+            const ok = await window.electronAPI.deepRefresh();
+            if (!ok) {
+                messageEl.textContent = 'Deep refresh did not complete.';
+                messageEl.className = 'status-row error';
+            }
+        }
 
         function closeAdmin() {
             window.electronAPI.closeAdmin();
@@ -356,7 +694,6 @@
             }
         });
 
-        // Listen for updater status messages from main process
         if (window.electronAPI.onUpdateStatus) {
             window.electronAPI.onUpdateStatus((payload) => {
                 const messageEl = document.getElementById('settingsMessage');

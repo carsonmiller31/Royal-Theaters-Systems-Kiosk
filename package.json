@@ -1,6 +1,6 @@
 {
   "name": "royal-theaters-systems-kiosk",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Royal Theaters Systems Electron wrapper",
   "main": "main.js",
   "homepage": "https://github.com/carsonmiller31/Royal-Theaters-Systems-Kiosk",
