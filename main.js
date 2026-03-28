@@ -369,14 +369,17 @@ ipcMain.handle('print', async (event, htmlContent) => {
       <head>
         <meta charset="UTF-8">
         <style>
-          body { 
-            font-family: 'Courier New', monospace; 
-            font-size: 12px; 
-            margin: 10px; 
+          * { box-sizing: border-box; }
+          body {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 0;
             padding: 0;
+            width: 100%;
           }
           @media print {
-            body { margin: 0; }
+            body { margin: 0; padding: 0; }
+            @page { margin: 0; }
           }
         </style>
       </head>
@@ -392,9 +395,13 @@ ipcMain.handle('print', async (event, htmlContent) => {
     // Wait for content to load
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Print to default printer, silent
+    // Print to default printer, silent, with receipt-sized margins
     return new Promise((resolve, reject) => {
-      printWin.webContents.print({ silent: true }, (success, errorType) => {
+      printWin.webContents.print({
+        silent: true,
+        margins: { marginType: 'none' },
+        pageSize: { width: 80000, height: 297000 },  // 80mm x 297mm in microns
+      }, (success, errorType) => {
         printWin.close();
         if (success) {
           console.log('✅ PRINT SUCCESS');
