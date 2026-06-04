@@ -400,7 +400,10 @@ ipcMain.handle('print', async (event, htmlContent) => {
       printWin.webContents.print({
         silent: true,
         margins: { marginType: 'none' },
-        pageSize: { width: 80000, height: 297000 },  // 80mm x 297mm in microns
+        // 3 1/8" (80mm) paper has only ~72mm of printable width — the printhead
+        // doesn't cover the full paper, so the page must be sized to 72mm or the
+        // right edge (e.g. the amount column) gets clipped.
+        pageSize: { width: 72000, height: 297000 },  // 72mm printable x 297mm in microns
       }, (success, errorType) => {
         printWin.close();
         if (success) {
