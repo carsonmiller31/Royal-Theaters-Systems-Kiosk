@@ -22,7 +22,11 @@ jobs:
         run: npm ci
 
       - name: Build Windows installer
-        run: npx electron-builder -w
+        # -p never: build only, do NOT let electron-builder auto-publish.
+        # The publish config in package.json would otherwise make it require
+        # GH_TOKEN and fail; the release + asset upload is handled by the
+        # explicit steps below using the built-in GITHUB_TOKEN.
+        run: npx electron-builder -w -p never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
