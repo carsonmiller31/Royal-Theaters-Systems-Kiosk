@@ -6,6 +6,13 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# The release/upload steps use the built-in GITHUB_TOKEN to create releases
+# and upload assets, which requires write access to repo contents. Without
+# this the gh API calls fail with "HTTP 403: Resource not accessible by
+# integration" when the repo's default workflow permissions are read-only.
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: windows-latest
