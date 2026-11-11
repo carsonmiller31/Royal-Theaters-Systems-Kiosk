@@ -1,21 +1,20 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('electron');
+const { checkNewAppUrl, checkNewPassword, hashPassword, verifyPassword } = require('./kiosk-security');
 
 class SettingsManager {
-  constructor() {
+  constructor({ userDataDir = require('electron').app.getPath('userData') } = {}) {
     // Store settings in user-writable location
-    const userDataDir = app.getPath('userData');
     this.configPath = path.join(userDataDir, 'config.json');
     this.legacyConfigPath = path.join(__dirname, 'config.json');
 
     this.defaults = {
       appUrl: 'https://systems.royaltheaters.com/showtimes/kiosk',
-      adminPassword: '1016',
       hasSeenDriverPrompt: false,
       driverInstalled: false
     };
     this.settings = this.loadSettings();
+    this.migrateAdminPassword();
   }
 
   isLegacyDefaultUrl(appUrl) {
@@ -87,17 +86,57 @@ class SettingsManager {
     return this.saveSettings();
   }
 
+  // Older builds saved the password in plain text. It keeps working, as a hash,
+  // and the admin panel asks for a new one because it may be the old shared default.
+  migrateAdminPassword() {
+    const plain = this.settings.adminPassword;
+    if (plain === undefined) return;
+    if (typeof plain === 'string' && plain && !this.settings.adminPasswordHash) {
+      this.settings.adminPasswordHash = hashPassword(plain);
+      this.settings.adminPasswordNeedsChange = true;
+    }
+    delete this.settings.adminPassword;
+    this.saveSettings();
+  }
+
+  hasPassword() {
+    return !!this.settings.adminPasswordHash;
+  }
+
+  needsPasswordChange() {
+    return this.settings.adminPasswordNeedsChange === true;
+  }
+
   validatePassword(password) {
-    return password === this.settings.adminPassword;
+    return verifyPassword(password, this.settings.adminPasswordHash);
+  }
+
+  setPassword(password) {
+    const check = checkNewPassword(password);
+    if (!check.ok) return check;
+    this.settings.adminPasswordHash = hashPassword(password);
+    delete this.settings.adminPasswordNeedsChange;
+    return this.saveSettings() ? { ok: true } : { ok: false, error: 'Could not save the password.' };
   }
 
   getAll() {
     return { ...this.settings };
   }
 
+  // Only the two values the admin panel edits can be changed here.
   updateSettings(newSettings) {
-    this.settings = { ...this.settings, ...newSettings };
-    return this.saveSettings();
+    const { appUrl, adminPassword } = newSettings || {};
+    if (appUrl !== undefined && appUrl !== this.settings.appUrl) {
+      const check = checkNewAppUrl(appUrl);
+      if (!check.ok) return check;
+    }
+    if (adminPassword !== undefined) {
+      const check = checkNewPassword(adminPassword);
+      if (!check.ok) return check;
+    }
+    if (appUrl !== undefined) this.settings.appUrl = appUrl.trim();
+    if (adminPassword !== undefined) return this.setPassword(adminPassword);
+    return this.saveSettings() ? { ok: true } : { ok: false, error: 'Could not save settings.' };
   }
 
   save() {

@@ -418,8 +418,8 @@
         <div class="auth-form" id="authForm" style="display:none;">
             <div class="admin-header">
                 <div>
-                    <h1>Admin Sign-In</h1>
-                    <p>Enter the kiosk admin password to unlock protected settings for this terminal.</p>
+                    <h1 id="authTitle">Admin Sign-In</h1>
+                    <p id="authHint">Enter the kiosk admin password to unlock protected settings for this terminal.</p>
                 </div>
                 <div class="admin-badge">Secure</div>
             </div>
@@ -429,13 +429,19 @@
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" placeholder="Enter admin password">
+                    </div>
+                    <div class="form-group" id="confirmGroup" style="display:none;">
+                        <label for="passwordConfirm">Confirm Password</label>
+                        <input type="password" id="passwordConfirm" placeholder="Type it again">
+                    </div>
+                    <div class="form-group">
                         <div id="authError" class="status-row error"></div>
                     </div>
                 </div>
             </div>
             <div class="button-group">
                 <button class="btn btn-cancel" onclick="showHomeForm()">Back</button>
-                <button class="btn btn-save" onclick="authenticate()">Login</button>
+                <button class="btn btn-save" id="authSubmit" onclick="authenticate()">Login</button>
             </div>
         </div>
 
@@ -470,6 +476,7 @@
                     <div class="form-group">
                         <label for="newPassword">New Admin Password</label>
                         <input type="password" id="newPassword" placeholder="Leave blank to keep current">
+                        <div id="passwordChangeNotice" class="helper-text" style="display:none;">This kiosk still has a password from before the last update, which may be the old shared one. Set a new password of at least 8 characters.</div>
                     </div>
                     <div id="settingsMessage" class="status-row success"></div>
                 </div>
@@ -487,6 +494,7 @@
     <script>
         let currentSettings = {};
         let envListenersBound = false;
+        let creatingPassword = false;
         const PROD_URL = 'https://systems.royaltheaters.com/showtimes/kiosk';
         const DEV_URL = 'http://192.168.1.186:3000';
 
@@ -505,11 +513,39 @@
             document.getElementById('password').value = '';
         }
 
-        function showAuthForm() {
+        async function showAuthForm() {
             document.getElementById('homeForm').style.display = 'none';
             document.getElementById('authForm').style.display = 'block';
             document.getElementById('settingsForm').style.display = 'none';
+
+            const state = await window.electronAPI.getAdminState();
+            creatingPassword = !state.passwordSet;
+            document.getElementById('confirmGroup').style.display = creatingPassword ? 'block' : 'none';
+            document.getElementById('authTitle').textContent = creatingPassword ? 'Create Admin Password' : 'Admin Sign-In';
+            document.getElementById('authHint').textContent = creatingPassword
+                ? 'This kiosk has no admin password yet. Create one of at least 8 characters to protect its settings.'
+                : 'Enter the kiosk admin password to unlock protected settings for this terminal.';
+            document.getElementById('authSubmit').textContent = creatingPassword ? 'Create Password' : 'Login';
             document.getElementById('password').focus();
+        }
+
+        async function createPassword(password) {
+            const errorEl = document.getElementById('authError');
+            if (password !== document.getElementById('passwordConfirm').value) {
+                errorEl.textContent = 'Passwords do not match';
+                return;
+            }
+            const result = await window.electronAPI.setInitialPassword(password);
+            if (result.ok) {
+                errorEl.textContent = '';
+                document.getElementById('password').value = '';
+                document.getElementById('passwordConfirm').value = '';
+                creatingPassword = false;
+                currentSettings = result.settings;
+                showSettingsForm();
+            } else {
+                errorEl.textContent = result.error || 'Could not set the password';
+            }
         }
 
         async function authenticate() {
@@ -522,13 +558,19 @@
             }
 
             try {
+                if (creatingPassword) {
+                    await createPassword(password);
+                    return;
+                }
                 const result = await window.electronAPI.validatePassword(password);
                 if (result.valid) {
                     errorEl.textContent = '';
                     currentSettings = result.settings;
                     showSettingsForm();
                 } else {
-                    errorEl.textContent = 'Invalid password';
+                    errorEl.textContent = result.retryAfterMs
+                        ? `Too many attempts. Try again in ${Math.ceil(result.retryAfterMs / 1000)} seconds.`
+                        : 'Invalid password';
                     document.getElementById('password').value = '';
                     document.getElementById('password').focus();
                 }
@@ -545,6 +587,7 @@
             const appUrlInput = document.getElementById('appUrl');
             const currentUrl = currentSettings.appUrl || '';
             appUrlInput.value = currentUrl;
+            document.getElementById('passwordChangeNotice').style.display = currentSettings.needsPasswordChange ? 'block' : 'none';
 
             if (currentUrl === PROD_URL) {
                 document.getElementById('envProd').checked = true;
@@ -588,14 +631,14 @@
 
             try {
                 const result = await window.electronAPI.saveSettings(settings);
-                if (result) {
+                if (result && result.ok) {
                     messageEl.textContent = 'Settings saved successfully! Restart app to apply URL changes.';
                     messageEl.className = 'success';
                     setTimeout(() => {
                         closeAdmin();
                     }, 2000);
                 } else {
-                    messageEl.textContent = 'Failed to save settings';
+                    messageEl.textContent = (result && result.error) || 'Failed to save settings';
                     messageEl.className = 'error';
                 }
             } catch (error) {

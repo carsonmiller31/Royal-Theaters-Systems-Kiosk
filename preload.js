@@ -77,7 +77,10 @@ function setupAdminSwipeGesture() {
 contextBridge.exposeInMainWorld('electronAPI', {
   print: (text) => ipcRenderer.invoke('print', text),
   openAdminPanel: () => ipcRenderer.invoke('open-admin-panel'),
+  retryAppLoad: () => ipcRenderer.invoke('retry-app-load'),
+  getAdminState: () => ipcRenderer.invoke('get-admin-state'),
   validatePassword: (password) => ipcRenderer.invoke('validate-password', password),
+  setInitialPassword: (password) => ipcRenderer.invoke('set-initial-password', password),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
   closeAdmin: () => ipcRenderer.invoke('close-admin'),
   // Update functions

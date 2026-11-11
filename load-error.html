@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Can't reach the app</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      text-align: center;
+    }
+    h1 { margin: 0; font-size: 32px; }
+    p { margin: 0; font-size: 18px; color: #bbb; max-width: 560px; }
+    .buttons { display: flex; gap: 16px; margin-top: 16px; }
+    button {
+      min-width: 180px;
+      min-height: 64px;
+      padding: 0 24px;
+      border: 1px solid #555;
+      border-radius: 10px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Can't reach the app</h1>
+  <p>Check this kiosk's network connection. It will keep trying on its own.</p>
+  <div class="buttons">
+    <button type="button" id="retry">Try Again</button>
+    <button type="button" id="admin">Admin</button>
+  </div>
+  <script>
+    document.getElementById('retry').addEventListener('click', () => window.electronAPI.retryAppLoad());
+    document.getElementById('admin').addEventListener('click', () => window.electronAPI.openAdminPanel());
+  </script>
+</body>
+</html>
