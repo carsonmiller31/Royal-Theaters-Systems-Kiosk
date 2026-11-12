@@ -86,14 +86,13 @@ class SettingsManager {
     return this.saveSettings();
   }
 
-  // Older builds saved the password in plain text. It keeps working, as a hash,
-  // and the admin panel asks for a new one because it may be the old shared default.
+  // Older builds saved the password in plain text. It keeps working, stored as a
+  // hash, with no prompt to change it.
   migrateAdminPassword() {
     const plain = this.settings.adminPassword;
     if (plain === undefined) return;
     if (typeof plain === 'string' && plain && !this.settings.adminPasswordHash) {
       this.settings.adminPasswordHash = hashPassword(plain);
-      this.settings.adminPasswordNeedsChange = true;
     }
     delete this.settings.adminPassword;
     this.saveSettings();
@@ -101,10 +100,6 @@ class SettingsManager {
 
   hasPassword() {
     return !!this.settings.adminPasswordHash;
-  }
-
-  needsPasswordChange() {
-    return this.settings.adminPasswordNeedsChange === true;
   }
 
   validatePassword(password) {
@@ -115,7 +110,6 @@ class SettingsManager {
     const check = checkNewPassword(password);
     if (!check.ok) return check;
     this.settings.adminPasswordHash = hashPassword(password);
-    delete this.settings.adminPasswordNeedsChange;
     return this.saveSettings() ? { ok: true } : { ok: false, error: 'Could not save the password.' };
   }
 

@@ -20,7 +20,7 @@ test('an updated device keeps its saved password, hashed', () => {
   assert.equal(s.validatePassword('saved-pass'), true);
   assert.equal(s.validatePassword('other'), false);
   assert.equal(s.hasPassword(), true);
-  assert.equal(s.needsPasswordChange(), true);
+  assert.equal(d.onDisk().adminPasswordNeedsChange, undefined, 'no prompt to change it');
   const disk = d.onDisk();
   assert.equal(disk.adminPassword, undefined);
   assert.match(disk.adminPasswordHash, /^scrypt\$/);
@@ -47,7 +47,6 @@ test('a device with no saved password has no way in and no default', () => {
   }
   const s = device().open();
   assert.equal(s.hasPassword(), false);
-  assert.equal(s.needsPasswordChange(), false);
   assert.equal(s.getAll().adminPassword, undefined);
 });
 
@@ -67,7 +66,6 @@ test('changing the password clears the warning and retires the old one', () => {
   assert.equal(s.updateSettings({ adminPassword: 'a-new-password' }).ok, true);
   assert.equal(s.validatePassword('1234'), false);
   assert.equal(s.validatePassword('a-new-password'), true);
-  assert.equal(s.needsPasswordChange(), false);
   assert.equal(d.onDisk().adminPasswordNeedsChange, undefined);
 });
 

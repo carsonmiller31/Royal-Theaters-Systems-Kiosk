@@ -550,8 +550,7 @@ guardedHandle('print', async (event, htmlContent) => {
 // ADMIN HANDLERS
 function adminSettingsView() {
   return {
-    appUrl: settings.get('appUrl'),
-    needsPasswordChange: settings.needsPasswordChange()
+    appUrl: settings.get('appUrl')
   };
 }
 
